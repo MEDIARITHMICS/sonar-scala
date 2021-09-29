@@ -30,16 +30,6 @@ import scalariform.lexer.ScalaLexer
 import scalariform.lexer.Token
 import scalariform.utils.Utils._
 
-/** Defines Scala as a language for SonarQube */
-final class Scala(settings: Configuration) extends AbstractLanguage(Scala.LanguageKey, Scala.LanguageName) {
-  override def getFileSuffixes: Array[String] = {
-    val suffixes: Array[String] = settings.getStringArray(Scala.FileSuffixesPropertyKey)
-    val filtered: Array[String] = suffixes.filter(_.trim.nonEmpty)
-    if (filtered.nonEmpty) filtered
-    else Scala.DefaultFileSuffixes
-  }
-}
-
 object Scala {
   val LanguageKey = "scala"
   val LanguageName = "Scala"
@@ -53,7 +43,7 @@ object Scala {
   private val SourcesPropertyKey = "sonar.sources"
   private val DefaultSourcesFolder = "src/main/scala"
 
-  private val logger = Log(classOf[Scala])
+  private val logger = Log(classOf[ScalaPlugin])
 
   def getScalaVersion(settings: Configuration): ScalaVersion = {
     def parseVersion(s: String): Option[ScalaVersion] =
@@ -107,9 +97,6 @@ final class ScalaPlugin extends Plugin {
     context.addExtensions(
       // Global configuration.
       classOf[GlobalConfig],
-      // Scala.
-      classOf[Scala],
-      classOf[sensor.ScalaSensor],
       // PR decoration.
       classOf[pr.GlobalIssues],
       classOf[pr.GithubPrReviewJob],
