@@ -20,6 +20,7 @@ package scalastyle
 
 import com.mwz.sonar.scala.metadata.ParamType._
 import com.mwz.sonar.scala.metadata.Rule
+import com.mwz.sonar.scala.metadata.Severity.{Blocker, Critical, Info, Major, Minor}
 import com.mwz.sonar.scala.metadata.scalastyle.ScalastyleRulesRepository._
 import com.mwz.sonar.scala.scalastyle.ScalastyleRulesRepository._
 import org.sonar.api.rule.RuleStatus
@@ -63,6 +64,14 @@ object ScalastyleRulesRepository {
     newRule.setStatus(RuleStatus.READY)
     newRule.setSeverity(rule.severity.entryName.toUpperCase)
     newRule.setType(RuleType.CODE_SMELL)
+    val baseEffort = rule.severity match {
+      case Blocker  => "3h"
+      case Critical => "1h"
+      case Major    => "20min"
+      case Minor    => "10min"
+      case Info     => "5min"
+    }
+    newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().constantPerIssue(baseEffort))
 
     // Create parameters.
     rule.params.toList.foreach(param => createParam(newRule, param))

@@ -19,6 +19,7 @@ package com.mwz.sonar.scala
 package scapegoat
 
 import com.mwz.sonar.scala.metadata.Rule
+import com.mwz.sonar.scala.metadata.Severity.{Blocker, Critical, Info, Major, Minor}
 import com.mwz.sonar.scala.metadata.scapegoat.ScapegoatRulesRepository._
 import com.mwz.sonar.scala.scapegoat.ScapegoatRulesRepository._
 import org.sonar.api.rule.RuleStatus
@@ -56,5 +57,13 @@ object ScapegoatRulesRepository {
     newRule.setStatus(RuleStatus.READY)
     newRule.setSeverity(rule.severity.entryName.toUpperCase)
     newRule.setType(RuleType.CODE_SMELL)
+    val baseEffort = rule.severity match {
+      case Blocker  => "3h"
+      case Critical => "1h"
+      case Major    => "20min"
+      case Minor    => "10min"
+      case Info     => "5min"
+    }
+    newRule.setDebtRemediationFunction(newRule.debtRemediationFunctions().constantPerIssue(baseEffort))
   }
 }
